@@ -1,88 +1,38 @@
+import Plant from "../models/Plant.js"
 
-const plants = [
-    {
-        "Id": 5,
-        "name": "rose",
-        "price": 800,
-        "image": "https://rukminim2.flixcart.com/image/850/1000/kf0087k0/plant-sapling/9/e/y/floribunda-roses-1-arlo-original-imafvjdjvsgtprse.jpeg?q=90&crop=false",
-        "description": "this is a rose plant"
-    },
-    {
-        "Id": 7,
-        "name": "bamboo",
-        "price": 800,
-        "image": "https://rukminim2.flixcart.com/image/850/1000/kf0087k0/plant-sapling/9/e/y/floribunda-roses-1-arlo-original-imafvjdjvsgtprse.jpeg?q=90&crop=false",
-        "description": "this is a bamboo plant"
-    },
-    {
-        "Id": 8,
-        "name": "sunflower",
-        "price": 800,
-        "image": "https://rukminim2.flixcart.com/image/850/1000/kf0087k0/plant-sapling/9/e/y/floribunda-roses-1-arlo-original-imafvjdjvsgtprse.jpeg?q=90&crop=false",
-        "description": "this is a sunflower plant"
-    }
-]
 
-const postPlant = (req,res)=>{
-    const{name,price,image,description}=req.body
+const postPlant =async (req,res)=>{
+    
+    const newPlant=new Plant({
+        name:req.body.name,
+        price:req.body.price,
+        image:req.body.image,
+        description:req.body.description
+    })
 
-    if(!name){
-        return res.json({
-            success:false,
-            data:null,
-            message:"name is required..."       
-        })
-    }
-    if(!price){
-        return res.json({
-            success:false,
-            data:null,
-            message:"price is required..."       
-        })
-    }
-    if(!image){
-        return res.json({
-            success:false,
-            data:null,
-            message:"image is required..."       
-        })
-    }
-    if(!description){
-        return res.json({
-            success:false,
-            data:null,
-            message:"description is required..."       
-        })
-    }
-    const randomID=Math.round(Math.random()*10000)
-
-    const newPlant={
-        Id:randomID,
-        name:name,
-        price:price,
-        image:image,
-        description:description
-    }
-
-    plants.push(newPlant);
+    const savedPlant= await newPlant.save();
 
     res.json({
         success:true,
-        data:newPlant,
+        data:savedPlant,
         message:"new plant successfully created",
     })
 }
-const getallPlants=(req,res)=>{
+const getallPlants=async(req,res)=>{
+    const allPlants= await Plant.find(); 
+
     res.json({
         success:true,
-        data:plants,
+        data:allPlants,
         message:"this is true"        
 })   
 }
-const getPlantId=(req,res)=>{
+const getPlantId=async (req,res)=>{
     const{ID}=req.params
     
-    const plant=plants.find((p)=>p.Id==ID)
+    const plant=await Plant.findOne({
+        _id:ID
+    })
 
     res.json({
         success:plant ? true : false,
@@ -90,65 +40,36 @@ const getPlantId=(req,res)=>{
         message:plant ? "Plant fetched successfully" : "Plant not found",
     })      
 }
-const updatePlant=(req,res)=>{
+const updatePlant=async (req,res)=>{
     const{ID}=req.params
 
-    let Index=-1;
+    const updatedResult=await Plant.updateOne({_id:ID},{
 
-    plants.forEach((plant,i)=>{
-        if(plant.Id==ID){
-            Index=i;
-        }
-    })
-
-    const newUpdatedObj={
+        $set:{
         name:req.body.name,
         price:req.body.price,
         image:req.body.image,
         description:req.body.description
     }
-    
-    if(Index==-1){
-        return res.json({
-            success:false,
-            message:"Plant not found",
-            data:null
-        })
-    }else{
-        plants[Index]=newUpdatedObj;
-        return res.json({
-            success:true,
-            message:"Plant updated successfully",
-            data:newUpdatedObj
-        })
-    }
-}
-const deletePlant=(req,res)=>{
-    const{ID}=req.params
-
-    let Index=-1;
-
-    plants.forEach((plant,i)=>{
-        if(plant.Id==ID){
-            Index=i;
-        }
     })
 
-    if(Index==-1){
-        return res.json({
-             success:false,
-             message:`Plant not found at this index ${Index}`
-        })
-    }
+    const updatedPlant= await Plant.findOne({_id:ID})
 
-    plants.splice(Index,1)
+    res.json({
+        success:true,
+        message:"Plant updated successfully",
+        data:updatedPlant
+    })
+}
+const deletePlant= async(req,res)=>{
+    const{ID}=req.params
+
+    const deletePlant=await Plant.deleteOne({_id:ID})
 
     res.json({
         success:true,
         message:"plant deleted successfully"
     })
 }
-
-
 
 export {postPlant,getallPlants,getPlantId,updatePlant,deletePlant}

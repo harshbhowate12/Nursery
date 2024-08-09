@@ -2,12 +2,14 @@ import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
 import mongoose from "mongoose";
+import cors from "cors"
 
 import { postPlant ,getallPlants,getPlantId,updatePlant,deletePlant} from "./controllers/plant.js";
 import {health} from "./controllers/health.js"
 import { errorNotFound } from "./controllers/errors.js";
 
 const server=express()
+server.use(cors())
 server.use(express.json());
 
 const dbConnection= async()=>{
