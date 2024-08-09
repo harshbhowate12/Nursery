@@ -15,11 +15,11 @@ const postPlant =async (req,res)=>{
     res.json({
         success:true,
         data:savedPlant,
-        message:"new plant successfully created",
+        message:"New plant added successfully ",
     })
 }
 const getallPlants=async(req,res)=>{
-    const allPlants= await Plant.find(); 
+    const allPlants= await Plant.find().sort({createdAt:-1}); 
 
     res.json({
         success:true,
